@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -36,10 +38,12 @@ namespace RavenLibrary
             services.AddSingleton<IDocumentStore>(_ =>
             {
                 var dbConfig = Configuration.GetSection("Database").Get<Settings.DatabaseSettings>();
+                string[] urlAddressArray = {Environment.GetEnvironmentVariable("DB_URL")};
 
                 var store = new DocumentStore
                 {
-                    Urls = dbConfig.Urls,
+                   // Urls = dbConfig.Urls,
+                    Urls = urlAddressArray,
                     Database = dbConfig.DatabaseName
                 };
 
