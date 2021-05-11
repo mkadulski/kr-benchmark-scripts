@@ -12,7 +12,6 @@ namespace RavenLibrary
             CreateHostBuilder(args)
                 .Build()
                 .Run();
-
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -23,7 +22,7 @@ namespace RavenLibrary
                     webBuilder.UseKestrel(options => { options.ListenLocalhost(8080); });
                 }).ConfigureAppConfiguration((hostingContext, config) =>
                 {
-                    config.AddEnvironmentVariables("DB_URL");
+                    config.AddEnvironmentVariables("TEST_");
                 });
     }
 }
