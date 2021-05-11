@@ -19,10 +19,10 @@ namespace RavenLibrary
     {
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            Configuration = (IConfigurationRoot)configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        public IConfigurationRoot Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -37,17 +37,14 @@ namespace RavenLibrary
 
             services.AddSingleton<IDocumentStore>(_ =>
             {
-                var dbConfig = Configuration.GetSection("Database").Get<Settings.DatabaseSettings>();
-                string[] urlAddressArray = {Environment.GetEnvironmentVariable("DB_URL")};
+                var settings = new Settings();
+                Configuration.Bind(settings);
 
                 var store = new DocumentStore
                 {
-                    Urls = dbConfig.Urls,
-                    Database = dbConfig.DatabaseName
+                    Urls = settings.Database.Urls,
+                    Database = settings.Database.DatabaseName
                 };
-
-                if (!string.IsNullOrWhiteSpace(dbConfig.CertPath))
-                    store.Certificate = new X509Certificate2(dbConfig.CertPath, dbConfig.CertPass);
 
                 store.Initialize();
 
