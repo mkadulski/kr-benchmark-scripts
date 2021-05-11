@@ -42,8 +42,8 @@ namespace RavenLibrary
 
                 var store = new DocumentStore
                 {
-                   // Urls = dbConfig.Urls,
-                    Urls = urlAddressArray,
+                    Urls = dbConfig.Urls,
+                   // Urls = urlAddressArray,
                     Database = dbConfig.DatabaseName
                 };
 
