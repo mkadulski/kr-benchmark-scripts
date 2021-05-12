@@ -37,8 +37,16 @@ namespace RavenLibrary
 
             services.AddSingleton<IDocumentStore>(_ =>
             {
+                if (Configuration == null)
+                {
+                    throw new Exception("Configuration is null!");
+                }
                 var settings = new Settings();
                 Configuration.Bind(settings);
+                if (settings == null)
+                {
+                    throw new Exception("Generic error, settings are null!");
+                }
 
                 var store = new DocumentStore
                 {
