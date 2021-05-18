@@ -18,7 +18,7 @@ namespace RavenLibrary
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                    webBuilder.UseKestrel(options => { options.ListenLocalhost(8080); });
+                    webBuilder.UseKestrel(options => {  });
                 }).ConfigureAppConfiguration((hostingContext, config) =>
                 {
                     config.AddEnvironmentVariables("TEST_");

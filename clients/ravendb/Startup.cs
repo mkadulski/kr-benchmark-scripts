@@ -7,9 +7,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Indexes;
+using Raven.Client.Documents.Operations;
 using Raven.Client.Documents.Session;
+using Raven.Client.Exceptions;
+using Raven.Client.Exceptions.Database;
+using Raven.Client.ServerWide;
+using Raven.Client.ServerWide.Operations;
 using RavenLibrary.Infrastructure;
 using RavenLibrary.Raven.Indexes;
 
@@ -20,6 +26,32 @@ namespace RavenLibrary
         public Startup(IConfiguration configuration)
         {
             Configuration = (IConfigurationRoot)configuration;
+        }
+
+        public async Task EnsureDatabaseExists(IDocumentStore store, string database = null, bool createDatabaseIfNotExists = true)
+        {
+            database = database ?? store.Database;
+
+            if (string.IsNullOrWhiteSpace(database))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(database));
+
+            try
+            {
+                await store.Maintenance.ForDatabase(database).SendAsync(new GetStatisticsOperation());
+            }
+            catch (DatabaseDoesNotExistException)
+            {
+                if (createDatabaseIfNotExists == false)
+                    throw;
+
+                try
+                {
+                    await store.Maintenance.Server.SendAsync(new CreateDatabaseOperation(new DatabaseRecord(database)));
+                }
+                catch (ConcurrencyException)
+                {
+                }
+            }
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -55,6 +87,7 @@ namespace RavenLibrary
                 };
 
                 store.Initialize();
+                EnsureDatabaseExists(store, settings.Database.DatabaseName, true);
 
                 return store;
             });
